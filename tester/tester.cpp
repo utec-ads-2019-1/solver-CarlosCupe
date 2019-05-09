@@ -31,6 +31,7 @@ void Tester::execute() {
     for (int i = 0; i < size; ++i) {
         Operation* root = Operation::buildFromEquation(equations[i]);
         float respuesta = root->operate();
+        //cout << respuesta << endl;
         ASSERT(respuesta == results[i], "The solver is not working");
         cout << "Equation(" << i + 1 << ") solved" << endl;
     }
