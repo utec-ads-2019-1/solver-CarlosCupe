@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 #include <math.h>
-#include "sum.h"
 
 using namespace std;
+
 
 class Operation {
     protected:
@@ -104,12 +105,25 @@ class Variable : public Operation {
     string value;
 public:
     Variable(string _value_)
-    : Operation("Division"), value(_value_) { }
+    : Operation("Variable"), value(_value_) { }
+    
+    float operate();
+    ~Variable();
+};
+
+
+class Constant : public Operation {    
+    string value;
+public:
+    Constant(string _value_)
+    : Operation("Constante"), value(_value_) { }
     
     float operate() {
+        if (value == "")
+            return 0;
         return strtof(value.c_str(),0);
     }
-    ~Variable();
+    ~Constant();
 };
 
 #endif
