@@ -12,7 +12,7 @@ map<string, int> vaul;
 Operation* Operation::buildFromEquation(string equation) {
     int pos = -1;
     bool bracket;
-    
+
     cleanEquation(equation);
     
     bracket = equation[0] == '(' && equation[equation.size() - 1] == ')';
@@ -57,70 +57,49 @@ float Variable::operate() {
 
 void cleanEquation(string &equation) {
     string temp;
-    int init = -2, last = -2;
+    int init = -1;
+    int test = 0;
     bool r = true;
+    bool open_bracket = false;
     for(int i = 0; i < equation.size(); ++i) {
+        if (open_bracket) {
+            test = 0;
+            if (isMaxOrder(equation[i],test))
+                temp += ')';
+            open_bracket = false;
+        }
         if (equation[i] == '+' || equation[i] == '-') {
-            if (init == -2) {
-                last = init = i;
-                if (r != (equation[i] == '+'))
-                    r = false;
-                else
-                    r = true;
-            } else {
-                if (i == last + 1) {
-                    if (r != (equation[i] == '+'))
-                        r = false;
-                    else
-                        r = true;
-                    last = i;
-                }
-            }
+            if (init == -1) {
+                init = i;
+                r = (equation[i] == '+');
+            } else
+                r = (r == (equation[i] == '+'));
         } else {
-            if (init != -2) {
-                if (last - init > 0) {
-                    if (r)
-                        temp = temp + '+';
-                    else
-                        temp = temp + '-';
-                } else
-                    temp = temp + equation[init];
-                r = true;
-            }
-            init = last = -2;
-            temp = temp + equation[i];
-        }
-    }
-    equation = temp;
-    r = false;
-    temp = "";
-    for(int i = 0; i < equation.size(); ++i) {
-        if (r) {
-            init = 0;
-            temp = temp + equation[i];
-            if (isMaxOrder(equation[i],init) || i + 1 == equation.size()) {
-                r = false;
-                temp = temp + ')';
-            }
-        } else {        
-            temp = temp + equation[i];
-
-            if (equation[i] == '*' && i + 1 != equation.size()) {
-                if (equation[i + 1] == '+' || equation[i + 1] == '-') {
-                    r = true;
-                    temp = temp + '(';
-                    ++i;
-                    temp = temp + equation[i];
+            if (init != -1) {                
+                if (init > 0) {
+                    if (equation[init - 1] == '*') {
+                        temp += '(';
+                        open_bracket = true;
+                    }
                 }
+                temp += r ? '+' : '-';
+                r = true;
+                init = -1;
             }
+            temp = temp + equation[i];
         }
     }
 
+    if (open_bracket)
+        temp += ')';
+
     equation = temp;
-    //check = true;
 }
 
 bool isMaxOrder(char op, int &order) {
+    if (op > 47 && op < 58)
+        return false;
+    
     for(int i = order + 1; i < 5; ++i) {
         if(op == operators[i]) {
             order = i;
@@ -139,7 +118,6 @@ int maxOrder(string &equation, int &pos, bool &bracket) {
         }
         if (equation[i] == '(') ++count_bracket;
         if (equation[i] == ')') --count_bracket;
-
     }   return order;
 }
 
